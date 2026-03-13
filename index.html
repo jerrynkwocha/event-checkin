@@ -5,26 +5,18 @@
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Event Check-In</title>
-
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
-
   <style>
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    #reader {
-      border-radius: 16px;
-      overflow: hidden;
-      background: #f1f5f9;
-      min-height: 250px;
-    }
+    #reader { border-radius: 16px; overflow: hidden; background: #f1f5f9; min-height: 250px; }
     #reader button { display: none !important; }
     video { border-radius: 12px; object-fit: cover; }
   </style>
 </head>
 
 <body class="bg-slate-100 min-h-screen flex items-center justify-center px-4 py-8">
-
 <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6">
   
   <div class="text-center mb-4">
@@ -57,10 +49,7 @@
 
   <div id="loading" class="hidden text-center mb-3">
     <div class="inline-flex items-center gap-2 text-sm text-slate-600">
-      <svg class="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-      </svg>
+      <svg class="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
       Validating...
     </div>
   </div>
@@ -68,20 +57,16 @@
   <div id="result" class="mb-6"></div>
 
   <div class="border-t pt-4">
-    <div class="flex justify-between items-center mb-3">
-        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">🕒 Last 5 Scans</h3>
-        <span id="historyCount" class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">0/5</span>
-    </div>
+    <h3 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-widest">🕒 Last 5 Successful Scans</h3>
     <ul id="recentList" class="space-y-2 text-sm">
-      <li class="text-slate-400 italic text-center py-2">No history yet</li>
+      <li id="noHistory" class="text-slate-400 italic text-center py-2">No success history yet</li>
     </ul>
   </div>
 </div>
 
 <audio id="scanSound" src="https://assets.mixkit.co/active_storage/sfx/766/766-preview.mp3"></audio>
 <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
-<audio id="alreadySound" src="https://assets.mixkit.co/active_storage/sfx/1003/1003-preview.mp3"></audio>
-<audio id="errorSound" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+<audio id="alreadySound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio> <audio id="errorSound" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
 
 <script>
 let html5QrCode = null;
@@ -89,10 +74,7 @@ let recentCheckins = [];
 
 async function stopScannerSafely() {
   if (html5QrCode && html5QrCode.getState() > 1) {
-    try {
-      await html5QrCode.stop();
-      await html5QrCode.clear();
-    } catch (err) { console.warn(err); }
+    try { await html5QrCode.stop(); await html5QrCode.clear(); } catch (err) { console.warn(err); }
   }
 }
 
@@ -107,20 +89,14 @@ function unlockAudio() {
 async function startScanner() {
   unlockAudio();
   const btn = document.getElementById("scanBtn");
-  
   document.getElementById("result").innerHTML = "";
   document.getElementById("qrValueDisplay").classList.add("hidden");
-  
   btn.disabled = true;
   btn.innerText = "⌛ Opening Camera...";
-
   await stopScannerSafely();
-
   html5QrCode = new Html5Qrcode("reader");
-  const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
   try {
-    await html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
+    await html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, onScanSuccess);
     btn.innerText = "📷 Scanner Active";
     btn.classList.replace("bg-blue-600", "bg-emerald-600");
   } catch (err) {
@@ -132,32 +108,21 @@ async function startScanner() {
 
 async function onScanSuccess(decodedText) {
   playSound("scanSound");
-  
-  // Show raw data
   document.getElementById("rawText").innerText = decodedText;
   document.getElementById("qrValueDisplay").classList.remove("hidden");
-  
-  // STOP SCANNER IMMEDIATELY
   await stopScannerSafely();
-
   const btn = document.getElementById("scanBtn");
   btn.disabled = false;
   btn.innerText = "📷 Click Here To Scan QR Code";
   btn.classList.replace("bg-emerald-600", "bg-blue-600");
-
   document.getElementById("loading").classList.remove("hidden");
 
   // YOUR GOOGLE SCRIPT URL
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxf4GHyVpBr9ZxZqV_dZAR3T88wROe5pAAAIX2_ufKWVBDU4uDfhiX5u114gN5XZDbeuw/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbzCMqPfISw5wB7ajoAGDubYo9lONB9V1fNW9O-p_KI063n0jRdiZrSr_o8T_A9WxU6C6g/exec";
 
-  fetch(scriptURL, {
-    method: "POST",
-    body: JSON.stringify({ barcode: decodedText })
-  })
+  fetch(scriptURL, { method: "POST", body: JSON.stringify({ barcode: decodedText }) })
   .then(res => res.json())
-  .then(data => {
-    showResult(data);
-  })
+  .then(data => showResult(data))
   .catch(err => {
     document.getElementById("loading").classList.add("hidden");
     document.getElementById("result").innerHTML = '<div class="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">Server Error</div>';
@@ -176,43 +141,30 @@ function showResult(response) {
 
   if (response.status === "success") {
     playSound("successSound");
-    document.getElementById("counter").innerText = response.stats ? response.stats.checkedIn : "0";
-    addRecent(response.user.name, "success");
-    html = `<div class="bg-green-50 border border-green-200 rounded-xl p-4">
-              <h3 class="font-semibold text-green-800">✅ Welcome, ${response.user.name}</h3>
-            </div>`;
+    // Update Counter from Server Stats
+    if(response.stats) document.getElementById("counter").innerText = response.stats.checkedIn;
+    addRecent(response.user.name);
+    html = `<div class="bg-green-50 border border-green-200 rounded-xl p-4"><h3 class="font-semibold text-green-800">✅ Welcome, ${response.user.name}</h3></div>`;
   } else if (response.status === "already_checked") {
     playSound("alreadySound");
-    addRecent(response.user.name, "already");
-    html = `<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-              <h3 class="font-semibold text-yellow-800">⚠️ Already In: ${response.user.name}</h3>
-            </div>`;
+    html = `<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4"><h3 class="font-semibold text-yellow-800">⚠️ Already In: ${response.user.name}</h3></div>`;
   } else {
     playSound("errorSound");
-    html = `<div class="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 font-medium">❌ Invalid QR</div>`;
+    html = `<div class="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">❌ Invalid QR</div>`;
   }
-
   document.getElementById("result").innerHTML = html;
 }
 
-function addRecent(name, status) {
-  recentCheckins.unshift({ 
-    name, 
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    status
-  });
+function addRecent(name) {
+  const noHistory = document.getElementById("noHistory");
+  if(noHistory) noHistory.remove();
 
-  // Strict limit to last 5
+  recentCheckins.unshift({ name, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
   if (recentCheckins.length > 5) recentCheckins.pop();
 
-  document.getElementById("historyCount").innerText = `${recentCheckins.length}/5`;
-
   document.getElementById("recentList").innerHTML = recentCheckins.map(item => `
-    <li class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 flex justify-between items-center">
-      <div class="flex items-center gap-2">
-        <span class="w-1.5 h-1.5 rounded-full ${item.status === 'success' ? 'bg-green-500' : 'bg-yellow-500'}"></span>
-        <span class="font-medium text-slate-700">${item.name}</span>
-      </div>
+    <li class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 flex justify-between items-center animate-in fade-in duration-300">
+      <span class="font-medium text-slate-700">${item.name}</span>
       <span class="text-[10px] text-slate-400 font-mono">${item.time}</span>
     </li>
   `).join("");
@@ -220,4 +172,3 @@ function addRecent(name, status) {
 </script>
 </body>
 </html>
-
