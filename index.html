@@ -2,241 +2,256 @@
 <html>
 <head>
   <base target="_top">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
   <script src="https://cdn.tailwindcss.com"></script>
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
   <script src="https://unpkg.com/html5-qrcode@2.3.8"></script>
 
-  <style>
-    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    #reader { 
-      border-radius: 16px; 
-      overflow: hidden; 
-      background-color: #f1f5f9;
-      min-height: 250px;
-    }
-    #reader button { display: none !important; }
-  </style>
+<style>
+body{font-family:'Inter',sans-serif;-webkit-tap-highlight-color:transparent;}
+#reader{
+border-radius:16px;
+overflow:hidden;
+background:#f1f5f9;
+min-height:250px;
+}
+#reader button{display:none!important;}
+</style>
 </head>
 
 <body class="bg-slate-100 min-h-screen flex items-center justify-center px-4 py-8">
 
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6">
+<div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6">
 
-    <div class="text-center mb-4">
-      <h1 class="text-xl font-semibold text-slate-800">📱 Event Check-In</h1>
-      <p class="text-sm text-slate-500">Scan QR to validate attendee</p>
-    </div>
+<div class="text-center mb-4">
+<h1 class="text-xl font-semibold text-slate-800">📱 Event Check-In</h1>
+<p class="text-sm text-slate-500">Scan QR to validate attendee</p>
+</div>
 
-    <div class="flex items-center justify-between bg-slate-50 border rounded-xl px-4 py-3 mb-4">
-      <div>
-        <p class="text-xs text-slate-500">Total Checked-In</p>
-        <p id="counter" class="text-2xl font-semibold text-slate-800">0</p>
-      </div>
+<div class="flex items-center justify-between bg-slate-50 border rounded-xl px-4 py-3 mb-4">
+<div>
+<p class="text-xs text-slate-500">Total Checked-In</p>
+<p id="counter" class="text-2xl font-semibold text-slate-800">0</p>
+</div>
 
-      <label class="flex items-center gap-2 text-sm cursor-pointer">
-        <input type="checkbox" id="soundToggle" checked class="w-4 h-4 accent-blue-600">
-        🔊 Sound
-      </label>
-    </div>
+<label class="flex items-center gap-2 text-sm cursor-pointer">
+<input type="checkbox" id="soundToggle" checked class="w-4 h-4 accent-blue-600">
+🔊 Sound
+</label>
+</div>
 
-    <button
-      id="scanBtn"
-      onclick="startScanner()"
-      class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold mb-4 transition shadow-md active:scale-95">
-      📷 Click Here To Scan QR Code
-    </button>
+<button id="scanBtn"
+onclick="startScanner()"
+class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold mb-4 transition shadow-md active:scale-95">
+📷 Click Here To Scan QR Code
+</button>
 
-    <div id="reader" class="mb-4"></div>
+<div id="reader" class="mb-4"></div>
 
-    <div id="qrValue" class="mb-3"></div>
+<div id="qrValue" class="mb-3"></div>
 
-    <div id="loading" class="hidden text-center mb-3">
-      <div class="inline-flex items-center gap-2 text-sm text-slate-600">
-        <svg class="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-        </svg>
-        Validating QR…
-      </div>
-    </div>
+<div id="loading" class="hidden text-center mb-3">
+<div class="inline-flex items-center gap-2 text-sm text-slate-600">
+<svg class="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+</svg>
+Validating QR…
+</div>
+</div>
 
-    <div id="result" class="mb-6"></div>
+<div id="result" class="mb-6"></div>
 
-    <div class="border-t pt-4">
-      <h3 class="text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wider">🕒 Recent Check-Ins</h3>
-      <ul id="recentList" class="space-y-2 text-sm">
-        <li class="text-slate-400 italic text-center py-2">No scans yet</li>
-      </ul>
-    </div>
+<div class="border-t pt-4">
+<h3 class="text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wider">🕒 Recent Check-Ins</h3>
+<ul id="recentList" class="space-y-2 text-sm">
+<li class="text-slate-400 italic text-center py-2">No scans yet</li>
+</ul>
+</div>
 
-  </div>
+</div>
 
-  <audio id="scanSound" preload="auto"><source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg"></audio>
-  <audio id="successSound" preload="auto"><source src="https://www.myinstants.com/media/sounds/ding-sound-effect_2.mp3" type="audio/mpeg"></audio>
-  <audio id="alreadySound" preload="auto"><source src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3" type="audio/mpeg"></audio>
-  <audio id="errorSound" preload="auto"><source src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3" type="audio/mpeg"></audio>
+<audio id="scanSound"><source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+<audio id="successSound"><source src="https://www.myinstants.com/media/sounds/ding-sound-effect_2.mp3"></audio>
+<audio id="alreadySound"><source src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3"></audio>
+<audio id="errorSound"><source src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3"></audio>
 
-  <script>
-    let html5QrCode = null;
-    let totalCheckedIn = 0;
-    let recentCheckins = [];
+<script>
 
-    async function stopScannerSafely() {
-      if (html5QrCode && html5QrCode.getState() > 1) {
-        try {
-          await html5QrCode.stop();
-          html5QrCode.clear();
-        } catch (err) { console.warn("Stop error:", err); }
-      }
-    }
+let html5QrCode=null;
+let totalCheckedIn=0;
+let recentCheckins=[];
 
-    function unlockAudio() {
-      const sounds = ["scanSound", "successSound", "alreadySound", "errorSound"];
-      sounds.forEach(id => {
-        const s = document.getElementById(id);
-        if (s) { s.play().then(() => { s.pause(); s.currentTime = 0; }).catch(() => {}); }
-      });
-    }
+async function stopScannerSafely(){
+if(html5QrCode && html5QrCode.getState()>1){
+try{
+await html5QrCode.stop();
+html5QrCode.clear();
+}catch(err){}
+}
+}
 
-    async function startScanner() {
-      unlockAudio();
-      
-      const btn = document.getElementById("scanBtn");
-      const resultDiv = document.getElementById("result");
-      
-      resultDiv.innerHTML = "";
-      btn.disabled = true;
-      btn.innerText = "⌛ Requesting Camera...";
+function unlockAudio(){
+["scanSound","successSound","alreadySound","errorSound"].forEach(id=>{
+const s=document.getElementById(id);
+if(s){
+s.play().then(()=>{s.pause();s.currentTime=0}).catch(()=>{});
+}
+});
+}
 
-      await stopScannerSafely();
-      html5QrCode = new Html5Qrcode("reader");
+async function startScanner(){
 
-      const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+unlockAudio();
 
-      // START OF UPDATED START SECTION
-      html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
-      .then(() => {
-        updateBtnActive(btn);
-      })
-      .catch(err => {
-        console.warn("Back camera failed, trying default camera settings...");
-        // Fallback 1: Try any camera
-        return html5QrCode.start(undefined, config, onScanSuccess, onScanFailure);
-      })
-      .then(() => {
-        updateBtnActive(btn);
-      })
-      .catch(err => {
-        console.warn("Default camera failed, trying front camera...");
-        // Fallback 2: Try user camera
-        return html5QrCode.start({ facingMode: "user" }, config, onScanSuccess, onScanFailure);
-      })
-      .then(() => {
-        updateBtnActive(btn);
-      })
-      .catch(err => {
-        btn.disabled = false;
-        btn.innerText = "📷 Click Here To Scan QR Code";
-        
-        // Final Troubleshooting Alert
-        if (!window.isSecureContext) {
-            alert("Error: This app is not running on a secure (HTTPS) connection. Browsers block cameras on non-secure sites.");
-        } else {
-            alert("Final Permission Error: " + err + "\n\nTip: Check phone settings or try pasting the link directly into Chrome/Safari.");
-        }
-      });
-    }
+const btn=document.getElementById("scanBtn");
+const resultDiv=document.getElementById("result");
 
-    function updateBtnActive(btn) {
-        btn.disabled = false;
-        btn.innerText = "📷 Scanner Active";
-        btn.classList.replace("bg-blue-600", "bg-emerald-600");
-    }
+resultDiv.innerHTML="";
+btn.disabled=true;
+btn.innerText="⌛ Requesting Camera...";
 
-    function onScanFailure(error) { /* match fail */ }
+await stopScannerSafely();
 
-    async function onScanSuccess(decodedText) {
-      playSound("scan");
-      await stopScannerSafely();
-      
-      const btn = document.getElementById("scanBtn");
-      btn.innerText = "📷 Click Here To Scan QR Code";
-      btn.classList.replace("bg-emerald-600", "bg-blue-600");
+html5QrCode=new Html5Qrcode("reader");
 
-      document.getElementById("qrValue").innerHTML = `
-        <div class="bg-slate-50 border rounded-xl p-3 text-[10px] break-all text-slate-500">
-          <strong>Raw Data:</strong> ${decodedText}
-        </div>
-      `;
+const config={fps:10,qrbox:{width:250,height:250}};
 
-      document.getElementById("loading").classList.remove("hidden");
+html5QrCode.start(
+{facingMode:"environment"},
+config,
+onScanSuccess
+).then(()=>{
+btn.disabled=false;
+btn.innerText="📷 Scanner Active";
+btn.classList.replace("bg-blue-600","bg-emerald-600");
+})
+.catch(err=>{
+btn.disabled=false;
+btn.innerText="📷 Click Here To Scan QR Code";
+alert("Camera error: "+err);
+});
 
-      if (typeof google !== 'undefined') {
-        google.script.run
-          .withSuccessHandler(showResult)
-          .withFailureHandler((err) => {
-             document.getElementById("loading").classList.add("hidden");
-             alert("Server Error: " + err);
-          })
-          .processScan(decodedText);
-      }
-    }
+}
 
-    function playSound(type) {
-      if (!document.getElementById("soundToggle").checked) return;
-      const soundMap = { scan: "scanSound", success: "successSound", already_checked: "alreadySound", error: "errorSound" };
-      const sound = document.getElementById(soundMap[type]);
-      if (sound) { sound.currentTime = 0; sound.play().catch(() => {}); }
-    }
+async function onScanSuccess(decodedText){
 
-    function showResult(response) {
-      document.getElementById("loading").classList.add("hidden");
-      let html = "";
-      playSound(response.status);
+playSound("scan");
 
-      if (navigator.vibrate) {
-        if (response.status === "success") navigator.vibrate([100, 50, 100]);
-        else navigator.vibrate(300);
-      }
+await stopScannerSafely();
 
-      if (response.status === "success") {
-        totalCheckedIn++;
-        document.getElementById("counter").innerText = totalCheckedIn;
-        addRecent(response.user.name);
-        html = `
-          <div class="bg-green-50 border border-green-200 rounded-xl p-4">
-            <h3 class="font-semibold text-green-800">✅ Welcome, ${response.user.name}!</h3>
-            <p class="text-xs text-green-700 mt-1">Check-in recorded successfully.</p>
-          </div>
-        `;
-      } 
-      else if (response.status === "already_checked") {
-        html = `
-          <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-            <h3 class="font-semibold text-yellow-800">⚠️ Already Checked In</h3>
-            <p class="text-xs text-yellow-700 mt-1">${response.user.name} is already in.</p>
-          </div>
-        `;
-      } 
-      else {
-        html = `<div class="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm font-medium">❌ QR Not Found</div>`;
-      }
-      document.getElementById("result").innerHTML = html;
-    }
+const btn=document.getElementById("scanBtn");
 
-    function addRecent(name) {
-      recentCheckins.unshift({ name, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-      if (recentCheckins.length > 5) recentCheckins.pop();
-      document.getElementById("recentList").innerHTML = recentCheckins.map(item => `
-        <li class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 flex justify-between items-center">
-          <span class="font-medium text-slate-700">${item.name}</span>
-          <span class="text-[10px] text-slate-400 font-mono">${item.time}</span>
-        </li>`).join("");
-    }
-  </script>
+btn.innerText="📷 Click Here To Scan QR Code";
+btn.classList.replace("bg-emerald-600","bg-blue-600");
+
+document.getElementById("loading").classList.remove("hidden");
+
+fetch("https://script.google.com/macros/s/AKfycbyNSpeykH7NlnXmA9NKArWi2cSh2ArbcMkaBTEOtthUEWRauG6J5Txwf8C96yQqCgWPBw/exec",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+barcode:decodedText
+})
+})
+.then(res=>res.json())
+.then(data=>{
+showResult(data);
+})
+.catch(err=>{
+document.getElementById("loading").classList.add("hidden");
+document.getElementById("result").innerHTML=
+'<div class="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">Server error</div>';
+});
+
+}
+
+function playSound(type){
+
+if(!document.getElementById("soundToggle").checked)return;
+
+const map={
+scan:"scanSound",
+success:"successSound",
+already_checked:"alreadySound",
+error:"errorSound"
+};
+
+const s=document.getElementById(map[type]);
+
+if(s){
+s.currentTime=0;
+s.play().catch(()=>{});
+}
+
+}
+
+function showResult(response){
+
+document.getElementById("loading").classList.add("hidden");
+
+let html="";
+
+playSound(response.status);
+
+if(response.status==="success"){
+
+totalCheckedIn++;
+document.getElementById("counter").innerText=totalCheckedIn;
+
+addRecent(response.user.name);
+
+html=
+`<div class="bg-green-50 border border-green-200 rounded-xl p-4">
+<h3 class="font-semibold text-green-800">✅ Welcome, ${response.user.name}</h3>
+<p class="text-xs text-green-700 mt-1">Check-in recorded successfully.</p>
+</div>`;
+
+}
+else if(response.status==="already_checked"){
+
+html=
+`<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+<h3 class="font-semibold text-yellow-800">⚠️ Already Checked In</h3>
+<p class="text-xs text-yellow-700 mt-1">${response.user.name} is already in.</p>
+</div>`;
+
+}
+else{
+
+html=
+`<div class="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm font-medium">
+❌ QR Not Found
+</div>`;
+
+}
+
+document.getElementById("result").innerHTML=html;
+
+}
+
+function addRecent(name){
+
+recentCheckins.unshift({
+name,
+time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
+});
+
+if(recentCheckins.length>5)recentCheckins.pop();
+
+document.getElementById("recentList").innerHTML=
+recentCheckins.map(item=>`
+<li class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 flex justify-between">
+<span class="font-medium text-slate-700">${item.name}</span>
+<span class="text-[10px] text-slate-400 font-mono">${item.time}</span>
+</li>
+`).join("");
+
+}
+
+</script>
 </body>
 </html>
